@@ -19,106 +19,84 @@ Subscriptions:
     /follower/joint_states (sensor_msgs/JointState)
 """
 
-# TODO: read through the official ros humble documentation to find the definition of the joint states message type
-# TODO: find and read through the SaveJointStates service in soa_interfaces
+import csv
+import os
 
 import rclpy
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 
-# TODO: import the standard JointState message type
-# TODO: import the SaveJointStates service from soa_interfaces
+from sensor_msgs.msg import JointState
+from soa_interfaces.srv import SaveJointStates
 
 
 class SaveJointStatesNode(Node):
 
     def __init__(self):
         super().__init__('save_joint_states')
-
+        self.declare_parameter('joint_prefix', '')
         self._latest_js: JointState | None = None
         self._cb_group = ReentrantCallbackGroup()
 
         self.create_subscription(
-            # TODO: subscribte to the follower's joint_states topic
-            #       make sure to use the correct namespace
-            #       write a function to save the latest joint states from message to self._latest_js
-            #       use the callback group defined above
+            JointState,
+            '/follower/joint_states',
+            self._joint_states_callback,
+            10,
+            callback_group=self._cb_group,
         )
 
         self.create_service(
-            # TODO: define the save_joint_states service
-            #       make sure to use the correct namespace
-            #       use the save_joint_states function defined below
-            #       use the callback group defined above
+            SaveJointStates,
+            '/follower/save_joint_states',
+            self._handle_save_joint_states,
+            callback_group=self._cb_group,
         )
 
         self.get_logger().info('SaveJointStates service ready.')
 
+    def _joint_states_callback(self, msg: JointState):
+        self._latest_js = msg
+
     def _handle_save_joint_states(self, req, res):
-        """Handle the /follower/save_joint_states service request.
-
-        Captures the most recently received joint states and optionally writes
-        them to a CSV file. Returns immediately with success=False if no joint
-        state has been received yet.
-
-        Args:
-            req (SaveJointStates.Request): Service request containing:
-                csv_path (str): Filesystem path to the target CSV file.
-                    If empty, joint states are returned but not written to disk.
-            res (SaveJointStates.Response): Service response to populate.
-
-        Returns:
-            SaveJointStates.Response: Populated response with:
-                joint_states (sensor_msgs/JointState): The latest captured joint state.
-                success (bool): True if joint states were captured (and written,
-                    if csv_path was provided); False otherwise.
-        """
+        """Handle the /follower/save_joint_states service request."""
         if self._latest_js is None:
-            # TODO: handle the case where no joint states have been saved yet
-            #       use the ros logger to print an informative message
-            #       set the result (res) to false
-            #       return the result
+            self.get_logger().warn('No joint states received yet')
+            res.success = False
+            return res
 
-        # TODO: set res.joint_states equal to the latest joint states
-        #       set res.success to true
+        res.joint_states = self._latest_js
+        res.success = True
 
         if req.csv_path:
             try:
-                # TODO: use the function below to save the joint states to a csv
+                self._append_to_csv(req.csv_path, self._latest_js)
             except OSError as e:
-                # TODO: if there is an error, use the ros logger to log an error
-                #       set res.success to false
+                self.get_logger().error(f'Failed to write CSV: {e}')
+                res.success = False
 
         return res
 
     def _append_to_csv(self, path: str, js: JointState) -> None:
-        """Append a single row of joint positions to a CSV file.
+        """Append a single row of joint positions to a CSV file."""
+        prefix = self.get_parameter('joint_prefix').get_parameter_value().string_value
 
-        If the file does not yet exist, a header row is written first using the
-        joint names from the JointState message. Each subsequent call appends
-        one data row mapping joint names to their current positions.
+        # 过滤：只保留匹配 prefix 的关节；空 prefix 保留全部（单臂模式）
+        pairs = [(n, p) for n, p in zip(js.name, js.position)
+                 if n.startswith(prefix)]
 
-        Args:
-            path (str): Filesystem path to the target CSV file. The file is
-                created if it does not exist; existing content is preserved.
-            js (sensor_msgs/JointState): Joint state message whose ``name`` and
-                ``position`` fields supply the column headers and row values.
+        # 去掉 prefix，保持与单臂 CSV 格式一致
+        names     = [n.removeprefix(prefix) for n, _ in pairs]
+        positions = [p for _, p in pairs]
 
-        Returns:
-            None
-
-        Raises:
-            OSError: If the file cannot be opened or written to.
-        """
-        # TODO: write the joint states to a csv file
-        #       import any additional libraries you need
-        #       check if the file exists
-        #       open the file in append mode
-        #       if the file did not exist:
-        #           write a header line of the joint names
-        #       write a row of joint values corresponding to the header joint names
-        #       log the successful write using the ros logger
+        file_exists = os.path.exists(path)
+        with open(path, 'a', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=names)
+            if not file_exists:
+                writer.writeheader()
+            writer.writerow(dict(zip(names, positions)))
+        self.get_logger().info(f'Saved joint states to {path}')
 
 
 def main(args=None):

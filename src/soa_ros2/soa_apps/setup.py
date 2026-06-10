@@ -25,6 +25,8 @@ setup(
     entry_points={
         'console_scripts': [
             'go_to_joint_states = soa_apps.go_to_joint_states:main',
+            'go_to_joint_states_bimanual = soa_apps.go_to_joint_states_bimanual:main',
+            'orchestrator = soa_apps.orchestrator:main',
         ],
     },
 )

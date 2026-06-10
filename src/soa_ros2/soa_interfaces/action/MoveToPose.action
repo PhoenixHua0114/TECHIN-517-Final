@@ -1,0 +1,9 @@
+# Goal: target pose for the end effector
+geometry_msgs/Pose target_pose
+---
+# Result
+bool success
+string message
+---
+# Feedback
+float64 distance_to_goal

@@ -40,34 +40,38 @@ class MoveToJointStatesServer(Node):
     def __init__(self):
         super().__init__('move_to_joint_states_server')
 
-        # Declare configurable parameters
         self.declare_parameter('max_velocity', 0.5)
         self.declare_parameter('max_acceleration', 0.5)
         self.declare_parameter('num_planning_attempts', 5)
         self.declare_parameter('allowed_planning_time', 3.0)
+        self.declare_parameter('prefix', '')
 
-        # Callback group for pymoveit2 (must be reentrant)
+        prefix = self.get_parameter('prefix').get_parameter_value().string_value
+        # prefix = '' → 单臂模式 (group: arm)
+        # prefix = 'left_' → 左臂 (group: left_arm)
+        # prefix = 'right_' → 右臂 (group: right_arm)
+        if prefix:
+            group_name = prefix.rstrip('_') + '_arm'   # 'left_arm' / 'right_arm'
+        else:
+            group_name = soa_robot.MOVE_GROUP_ARM       # 'arm'
+
         self._cb_group = ReentrantCallbackGroup()
 
-        # Initialize MoveIt2 interface
         self._moveit2 = MoveIt2(
             node=self,
-            joint_names=soa_robot.joint_names(),
+            joint_names=soa_robot.joint_names(prefix),
             base_link_name=soa_robot.base_link_name(),
-            end_effector_name=soa_robot.end_effector_name(),
-            group_name=soa_robot.MOVE_GROUP_ARM,
+            end_effector_name=soa_robot.end_effector_name(prefix),
+            group_name=group_name,
             callback_group=self._cb_group,
         )
 
-        # Apply velocity/acceleration scaling
         self._moveit2.max_velocity = (
             self.get_parameter('max_velocity').get_parameter_value().double_value
         )
         self._moveit2.max_acceleration = (
             self.get_parameter('max_acceleration').get_parameter_value().double_value
         )
-
-        # Increase planning budget
         self._moveit2.num_planning_attempts = (
             self.get_parameter('num_planning_attempts')
             .get_parameter_value().integer_value
@@ -77,22 +81,20 @@ class MoveToJointStatesServer(Node):
             .get_parameter_value().double_value
         )
 
-        # Create action server
         self._action_server = ActionServer(
-            # TODO: create the action server
-            #       use the MoveToJointStates action defined in soa_interfaces
-            #       use the self._execute_callback function defined below
-            #       use the self._cb_group defined above
+            self,
+            MoveToJointStates,
+            'move_to_joint_states',
+            self._execute_callback,
+            callback_group=self._cb_group,
         )
 
         self.get_logger().info('MoveToJointStates action server ready')
 
     def _wait_and_publish_feedback(self, goal_handle, joint_names, target_positions):
-        """Wait for MoveIt2 execution, publishing feedback each iteration."""
         while self._moveit2.query_state() != MoveIt2State.IDLE:
             self._publish_feedback(goal_handle, joint_names, target_positions)
             time.sleep(0.1)
-        # Publish one final feedback with the settled joint error
         self._publish_feedback(goal_handle, joint_names, target_positions)
         return self._moveit2.motion_suceeded
 
@@ -102,42 +104,43 @@ class MoveToJointStatesServer(Node):
         joint_positions = list(goal_handle.request.joint_positions)
         joint_names = list(goal_handle.request.joint_names)
 
-        # Resolve default joint names
         if not joint_names:
-            joint_names = soa_robot.joint_names()
+            prefix = self.get_parameter('prefix').get_parameter_value().string_value
+            joint_names = soa_robot.joint_names(prefix)
 
         result = MoveToJointStates.Result()
 
         # --- Validation: length ---
         if len(joint_positions) != len(joint_names):
-            # TODO: handle the case if there are the wrong number of joint positions or names
-            #       use the goal_handle to abort the action
-            #       set the result success field to false
-            #       set the result message to something informative
-            #       log a warning with the ros logger
-            #       return the result
+            goal_handle.abort()
+            result.success = False
+            result.message = f'Length mismatch: {len(joint_names)} names vs {len(joint_positions)} positions'
+            self.get_logger().warn(result.message)
+            return result
+        
+        prefix = self.get_parameter('prefix').get_parameter_value().string_value
 
         # --- Validation: joint limits ---
         for name, pos in zip(joint_names, joint_positions):
-            if name not in _JOINT_LIMITS:
-                # TODO: handle the case of using the wrong joint name
-                #       abort the action
-                #       set the result success and message fields
-                #       log a warning
-                #       return the result
-            lo, hi = _JOINT_LIMITS[name]
+            bare_name = name.removeprefix(prefix)   # 'left_shoulder_pan' → 'shoulder_pan'
+            if bare_name not in _JOINT_LIMITS:
+                goal_handle.abort()
+                result.success = False
+                result.message = f'Unknown joint name: {name}'
+                self.get_logger().warn(result.message)
+                return result
+            lo, hi = _JOINT_LIMITS[bare_name]
             if not (lo <= pos <= hi):
-                # TODO: handle the case of joints out of bounds
-                #       abort the action
-                #       set the result success and message fields
-                #       log a warning
-                #       return the result
+                goal_handle.abort()
+                result.success = False
+                result.message = f'Joint {name}={pos:.4f} out of limits [{lo}, {hi}]'
+                self.get_logger().warn(result.message)
+                return result
 
         self.get_logger().info(
             f'Target joints: {joint_names}, positions: {joint_positions}'
         )
 
-        # --- Plan in joint space ---
         planning_time = (
             self.get_parameter('allowed_planning_time')
             .get_parameter_value().double_value
@@ -169,7 +172,6 @@ class MoveToJointStatesServer(Node):
             self.get_logger().error(result.message)
             return result
 
-        # --- Execute ---
         self._moveit2.execute(trajectory)
         success = self._wait_and_publish_feedback(goal_handle, joint_names, joint_positions)
 
@@ -189,7 +191,6 @@ class MoveToJointStatesServer(Node):
         return result
 
     def _publish_feedback(self, goal_handle, joint_names, target_positions):
-        """Publish max absolute joint error between current and target positions."""
         feedback = MoveToJointStates.Feedback()
         try:
             js = self._moveit2.joint_state
@@ -213,11 +214,9 @@ def main(args=None):
 
     node = MoveToJointStatesServer()
 
-    # Use MultiThreadedExecutor for pymoveit2 concurrent callbacks
     executor = MultiThreadedExecutor(2)
     executor.add_node(node)
 
-    # Wait for MoveIt2 initialization
     time.sleep(1.0)
 
     try:
