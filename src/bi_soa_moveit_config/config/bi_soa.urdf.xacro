@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="bi_soa">
+    <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+
+    <!-- Import bi_soa kinematic description (two arms on a stand, no hardware) -->
+    <xacro:include filename="$(find soa_description)/urdf/bi_soa_kinematics.urdf.xacro" />
+
+    <!-- Import mock ros2_control for simulation -->
+    <xacro:include filename="bi_soa.ros2_control.xacro" />
+
+    <xacro:bi_soa_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
+
+</robot>

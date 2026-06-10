@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: soa_description
+    relative_path: urdf/bi_soa_kinematics.urdf.xacro
+  srdf:
+    relative_path: config/bi_soa.srdf
+  package_settings:
+    author_name: jack
+    author_email: jhat@uw.edu
+    generated_timestamp: 1743552000
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
