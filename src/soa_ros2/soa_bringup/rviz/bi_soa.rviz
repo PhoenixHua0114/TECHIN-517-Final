@@ -1,15 +1,12 @@
 Panels:
   - Class: rviz_common/Displays
-    Help Height: 78
+    Help Height: 0
     Name: Displays
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /Follower RobotModel1
-        - /Leader RobotModel1
-        - /TF1
       Splitter Ratio: 0.5
-    Tree Height: 557
+    Tree Height: 146
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -19,7 +16,7 @@ Visualization Manager:
   Class: ""
   Displays:
     - Alpha: 0.5
-      Cell Size: 0.05
+      Cell Size: 0.05000000074505806
       Class: rviz_default_plugins/Grid
       Color: 160; 160; 164
       Enabled: true
@@ -36,7 +33,9 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
-    - Class: rviz_default_plugins/RobotModel
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
       Description File: ""
       Description Source: Topic
       Description Topic:
@@ -46,13 +45,110 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /follower/robot_description
       Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        left_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_gripper_frame_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        left_gripper_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_lower_arm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_moving_jaw_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_shoulder_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_upper_arm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_wrist_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_gripper_frame_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        right_gripper_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_lower_arm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_moving_jaw_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_shoulder_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_upper_arm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_wrist_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        stand_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Mass Properties:
+        Inertia: false
+        Mass: false
       Name: Follower RobotModel
       TF Prefix: follower
       Update Interval: 0
       Value: true
       Visual Enabled: true
-    - Class: rviz_default_plugins/RobotModel
-      Alpha: 0.5
+    - Alpha: 0.5
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
       Description File: ""
       Description Source: Topic
       Description Topic:
@@ -62,6 +158,15 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /leader/robot_description
       Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: ""
+      Mass Properties:
+        Inertia: false
+        Mass: false
       Name: Leader RobotModel
       TF Prefix: leader
       Update Interval: 0
@@ -72,11 +177,124 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-      Marker Scale: 0.2
+        follower/base_link:
+          Value: true
+        follower/left_base_link:
+          Value: true
+        follower/left_gripper_frame_link:
+          Value: true
+        follower/left_gripper_link:
+          Value: true
+        follower/left_lower_arm_link:
+          Value: true
+        follower/left_moving_jaw_link:
+          Value: true
+        follower/left_shoulder_link:
+          Value: true
+        follower/left_upper_arm_link:
+          Value: true
+        follower/left_wrist_link:
+          Value: true
+        follower/right_base_link:
+          Value: true
+        follower/right_gripper_frame_link:
+          Value: true
+        follower/right_gripper_link:
+          Value: true
+        follower/right_lower_arm_link:
+          Value: true
+        follower/right_moving_jaw_link:
+          Value: true
+        follower/right_shoulder_link:
+          Value: true
+        follower/right_upper_arm_link:
+          Value: true
+        follower/right_wrist_link:
+          Value: true
+        follower/stand_link:
+          Value: true
+        overhead_camoverhead_cam_color_frame:
+          Value: true
+        overhead_camoverhead_cam_color_optical_frame:
+          Value: true
+        overhead_camoverhead_cam_depth_frame:
+          Value: true
+        overhead_camoverhead_cam_depth_optical_frame:
+          Value: true
+        overhead_camoverhead_cam_overhead_cam_link:
+          Value: true
+      Marker Scale: 0.20000000298023224
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
+      Tree:
+        follower/base_link:
+          follower/left_base_link:
+            follower/left_shoulder_link:
+              follower/left_upper_arm_link:
+                follower/left_lower_arm_link:
+                  follower/left_wrist_link:
+                    follower/left_gripper_link:
+                      follower/left_gripper_frame_link:
+                        {}
+                      follower/left_moving_jaw_link:
+                        {}
+          follower/right_base_link:
+            follower/right_shoulder_link:
+              follower/right_upper_arm_link:
+                follower/right_lower_arm_link:
+                  follower/right_wrist_link:
+                    follower/right_gripper_link:
+                      follower/right_gripper_frame_link:
+                        {}
+                      follower/right_moving_jaw_link:
+                        {}
+          follower/stand_link:
+            {}
+      Update Interval: 0
+      Value: true
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /static_camera/overhead_cam/color/image_raw
+      Value: true
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /left_follower/image_raw
+      Value: true
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /right_follower/image_raw
       Value: true
   Enabled: true
   Global Options:
@@ -95,9 +313,8 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 0
       Class: rviz_default_plugins/Orbit
-      Distance: 1.2
+      Distance: 1.2000000476837158
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -106,16 +323,16 @@ Visualization Manager:
       Focal Point:
         X: 0
         Y: 0
-        Z: 0.15
+        Z: 0.15000000596046448
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4
+      Pitch: 0.4000000059604645
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz_default_plugins)
-      Yaw: 0.785
+      Yaw: 0.7850000262260437
     Saved: ~
 Window Geometry:
   Displays:
@@ -123,8 +340,11 @@ Window Geometry:
   Height: 900
   Hide Left Dock: false
   Hide Right Dock: false
+  Image:
+    collapsed: false
+  QMainWindow State: 000000ff00000000fd0000000100000000000001560000032efc0200000005fb000000100044006900730070006c006100790073010000003b000000cd000000c700fffffffb0000000a00560069006500770073000000022d0000013c000000a000fffffffb0000000a0049006d006100670065010000010e000000c40000002800fffffffb0000000a0049006d00610067006501000001d8000000c70000002800fffffffb0000000a0049006d00610067006501000002a5000000c40000002800ffffff0000041c0000032e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
   Width: 1400
-  X: 0
-  Y: 0
+  X: 66
+  Y: 32

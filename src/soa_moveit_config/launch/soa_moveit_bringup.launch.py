@@ -187,7 +187,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'cameras',
-            default_value='false',
+            default_value='true',
             description='Launch camera nodes alongside the arm hardware.',
         ),
         OpaqueFunction(function=launch_setup),

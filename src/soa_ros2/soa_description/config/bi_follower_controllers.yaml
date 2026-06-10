@@ -15,6 +15,18 @@
       right_gripper_controller:
         type: position_controllers/GripperActionController
 
+      left_arm_fwd_controller:
+        type: forward_command_controller/ForwardCommandController
+
+      right_arm_fwd_controller:
+        type: forward_command_controller/ForwardCommandController
+
+      left_gripper_fwd_controller:
+        type: forward_command_controller/ForwardCommandController
+
+      right_gripper_fwd_controller:
+        type: forward_command_controller/ForwardCommandController
+
       joint_state_broadcaster:
         type: joint_state_broadcaster/JointStateBroadcaster
 
@@ -55,3 +67,35 @@
     ros__parameters:
       joint: right_gripper
       allow_stalling: true
+
+  left_arm_fwd_controller:
+    ros__parameters:
+      joints:
+        - left_shoulder_pan
+        - left_shoulder_lift
+        - left_elbow_flex
+        - left_wrist_flex
+        - left_wrist_roll
+      interface_name: position
+
+  right_arm_fwd_controller:
+    ros__parameters:
+      joints:
+        - right_shoulder_pan
+        - right_shoulder_lift
+        - right_elbow_flex
+        - right_wrist_flex
+        - right_wrist_roll
+      interface_name: position
+
+  left_gripper_fwd_controller:
+    ros__parameters:
+      joints:
+        - left_gripper
+      interface_name: position
+
+  right_gripper_fwd_controller:
+    ros__parameters:
+      joints:
+        - right_gripper
+      interface_name: position

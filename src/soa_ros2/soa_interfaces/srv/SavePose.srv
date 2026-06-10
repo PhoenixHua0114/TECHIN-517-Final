@@ -1,4 +1,5 @@
-string csv_path   # Path to CSV file to append pose; if empty, pose is not saved
+string label
+string filepath
 ---
 bool success
-geometry_msgs/Pose pose
+string message

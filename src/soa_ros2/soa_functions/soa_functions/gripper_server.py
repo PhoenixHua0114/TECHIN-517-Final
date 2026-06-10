@@ -28,16 +28,28 @@ class GripperServer(Node):
     def __init__(self):
         super().__init__('gripper_server')
 
+        self.declare_parameter('prefix', '')
+
+        # prefix = ''       → 单臂模式 (group: gripper)
+        # prefix = 'left_'  → 左臂     (group: left_gripper)
+        # prefix = 'right_' → 右臂     (group: right_gripper)
+        prefix = self.get_parameter('prefix').get_parameter_value().string_value
+        if prefix:
+            group_name = prefix.rstrip('_') + '_gripper'  # 'left_gripper' / 'right_gripper'
+        else:
+            group_name = soa_robot.MOVE_GROUP_GRIPPER      # 'gripper'
+        self._prefix = prefix
+
         # Callback group for pymoveit2 (must be reentrant)
         self._cb_group = ReentrantCallbackGroup()
 
         # Initialize MoveIt2 for the gripper group
         self._moveit2 = MoveIt2(
             node=self,
-            joint_names=soa_robot.gripper_joint_names(),
+            joint_names=soa_robot.gripper_joint_names(prefix),
             base_link_name=soa_robot.base_link_name(),
-            end_effector_name=soa_robot.end_effector_name(),
-            group_name=soa_robot.MOVE_GROUP_GRIPPER,
+            end_effector_name=soa_robot.end_effector_name(prefix),
+            group_name=group_name,
             callback_group=self._cb_group,
         )
 
@@ -74,7 +86,7 @@ class GripperServer(Node):
         # Plan asynchronously (avoids rclpy.spin_once() inside executor callback)
         future = self._moveit2.plan_async(
             joint_positions=[target_position],
-            joint_names=soa_robot.gripper_joint_names(),
+            joint_names=soa_robot.gripper_joint_names(self._prefix),
         )
         if future is None:
             goal_handle.abort()

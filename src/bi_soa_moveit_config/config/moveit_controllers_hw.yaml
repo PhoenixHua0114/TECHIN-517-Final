@@ -1,0 +1,60 @@
+# Controller config for bi_soa_moveit_bringup (global namespace).
+# MoveIt's default action client paths match the server paths directly:
+# /left_arm_controller/follow_joint_trajectory, /right_arm_controller/follow_joint_trajectory, etc.
+
+controller_manager:
+  ros__parameters:
+    update_rate: 50
+
+    left_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    right_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    left_gripper_controller:
+      type: position_controllers/GripperActionController
+
+    right_gripper_controller:
+      type: position_controllers/GripperActionController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+left_arm_controller:
+  ros__parameters:
+    joints:
+      - left_shoulder_pan
+      - left_shoulder_lift
+      - left_elbow_flex
+      - left_wrist_flex
+      - left_wrist_roll
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+
+right_arm_controller:
+  ros__parameters:
+    joints:
+      - right_shoulder_pan
+      - right_shoulder_lift
+      - right_elbow_flex
+      - right_wrist_flex
+      - right_wrist_roll
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+
+left_gripper_controller:
+  ros__parameters:
+    joint: left_gripper
+    allow_stalling: true
+
+right_gripper_controller:
+  ros__parameters:
+    joint: right_gripper
+    allow_stalling: true

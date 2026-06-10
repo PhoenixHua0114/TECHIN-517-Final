@@ -22,6 +22,7 @@ cameras:
     attached_to: follower
     video_device: /dev/video0
     frame_id: follower_gripper_frame_link
+
   - name: overhead_cam
     camera_type: realsense2_camera
     param_path: soa_realsense2.yaml

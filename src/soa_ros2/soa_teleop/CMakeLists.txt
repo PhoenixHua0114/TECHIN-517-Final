@@ -21,6 +21,14 @@ target_include_directories(teleop_node PUBLIC
 
 install(TARGETS teleop_node DESTINATION lib/${PROJECT_NAME})
 
+add_executable(bi_teleop_node src/bi_teleop_node.cpp)
+ament_target_dependencies(bi_teleop_node rclcpp sensor_msgs std_msgs)
+target_include_directories(bi_teleop_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+install(TARGETS bi_teleop_node DESTINATION lib/${PROJECT_NAME})
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   set(ament_cmake_copyright_FOUND TRUE)

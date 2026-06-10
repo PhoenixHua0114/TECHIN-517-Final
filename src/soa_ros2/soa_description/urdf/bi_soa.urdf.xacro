@@ -50,11 +50,11 @@
   </joint>
   <xacro:stand/>
 
-  <!-- Left arm: -Y from center -->
+  <!-- Left arm: +Y from center -->
   <joint name="left_base_joint" type="fixed">
     <parent link="base_link"/>
     <child link="left_base_link"/>
-    <origin xyz="-0.01775 -0.13575 0.0248" rpy="0 0 0"/>
+    <origin xyz="-0.01775 0.13575 0.0248" rpy="0 0 0"/>
   </joint>
   <xacro:soa prefix="left_"/>
   <xacro:soa_ros2_control
@@ -76,11 +76,11 @@
     gripper_id="$(arg left_gripper_id)"
     gripper_offset="$(arg left_gripper_offset)"/>
 
-  <!-- Right arm: +Y from center -->
+  <!-- Right arm: -Y from center -->
   <joint name="right_base_joint" type="fixed">
     <parent link="base_link"/>
     <child link="right_base_link"/>
-    <origin xyz="-0.01775 0.13575 0.0248" rpy="0 0 0"/>
+    <origin xyz="-0.01775 -0.13575 0.0248" rpy="0 0 0"/>
   </joint>
   <xacro:soa prefix="right_"/>
   <xacro:soa_ros2_control

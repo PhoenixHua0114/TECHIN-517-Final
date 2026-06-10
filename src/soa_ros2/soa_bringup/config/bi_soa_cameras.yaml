@@ -30,6 +30,12 @@ cameras:
     video_device: /dev/video2
     frame_id: follower_right_gripper_frame_link
 
+  - name: overhead_cam
+    camera_type: realsense2_camera
+    param_path: soa_realsense2.yaml
+    attached_to: static_camera
+    serial_no: "241122070943"
+
   # Uncomment to add a shared static overhead RealSense camera:
   # - name: overhead_cam
   #   camera_type: realsense2_camera

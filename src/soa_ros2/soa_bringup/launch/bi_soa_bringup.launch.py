@@ -78,7 +78,7 @@ def _make_xacro_cmd(xacro_file: str, left_port: str, right_port: str,
     ])
 
 
-def _make_spawner_chain(controllers: list, cm_namespace: str) -> list:
+def _make_spawner_chain(controllers: list, cm_namespace: str, inactive: set = None) -> list:
     """Build a sequenced list of controller spawner nodes.
 
     Controllers are spawned one after another using OnProcessExit handlers
@@ -87,13 +87,18 @@ def _make_spawner_chain(controllers: list, cm_namespace: str) -> list:
     Args:
         controllers: List of controller names to spawn in order.
         cm_namespace: Namespace of the controller_manager to target.
+        inactive: Set of controller names to spawn in inactive state.
     """
+    inactive = inactive or set()
     spawners = []
     for name in controllers:
+        args = [name, '--controller-manager', f'/{cm_namespace}/controller_manager']
+        if name in inactive:
+            args.append('--inactive')
         spawners.append(Node(
             package='controller_manager',
             executable='spawner',
-            arguments=[name, '--controller-manager', f'/{cm_namespace}/controller_manager'],
+            arguments=args,
             output='screen',
         ))
 
@@ -115,6 +120,7 @@ def launch_setup(context, *args, **kwargs):
     leader = context.launch_configurations['leader']
     display = context.launch_configurations['display']
     cameras = context.launch_configurations['cameras']
+    controller_mode = context.launch_configurations['controller']
 
     bringup_share = get_package_share_directory('soa_bringup')
     description_share = get_package_share_directory('soa_description')
@@ -180,15 +186,29 @@ def launch_setup(context, *args, **kwargs):
         parameters=[follower_robot_description, follower_controllers_yaml],
     )
 
+    if controller_mode == 'forward':
+        active = [
+            'left_arm_fwd_controller', 'right_arm_fwd_controller',
+            'left_gripper_fwd_controller', 'right_gripper_fwd_controller',
+        ]
+        inactive = {
+            'left_arm_controller', 'right_arm_controller',
+            'left_gripper_controller', 'right_gripper_controller',
+        }
+    else:
+        active = [
+            'left_arm_controller', 'right_arm_controller',
+            'left_gripper_controller', 'right_gripper_controller',
+        ]
+        inactive = {
+            'left_arm_fwd_controller', 'right_arm_fwd_controller',
+            'left_gripper_fwd_controller', 'right_gripper_fwd_controller',
+        }
+
     follower_spawners = _make_spawner_chain(
-        [
-            'joint_state_broadcaster',
-            'left_arm_controller',
-            'right_arm_controller',
-            'left_gripper_controller',
-            'right_gripper_controller',
-        ],
+        ['joint_state_broadcaster'] + active + list(inactive),
         cm_namespace='follower',
+        inactive=inactive,
     )
 
     all_actions = [follower_rsp, follower_cm] + follower_spawners
@@ -259,8 +279,15 @@ def launch_setup(context, *args, **kwargs):
             output='screen',
         )
 
+        bi_teleop_node = Node(
+            package='soa_teleop',
+            executable='bi_teleop_node',
+            name='bi_teleop_node',
+            output='screen',
+        )
+
         all_actions += [leader_rsp, leader_cm] + leader_spawners
-        all_actions += [follower_static_tf, leader_static_tf]
+        all_actions += [follower_static_tf, leader_static_tf, bi_teleop_node]
 
     # --- Display (RViz) ---
     if display == 'true':
@@ -318,6 +345,12 @@ def generate_launch_description():
             default_value='true',
             description='Launch camera nodes (usb_cam / realsense2_camera). '
                         'Cameras are always on the follower arms only.',
+        ),
+        DeclareLaunchArgument(
+            'controller',
+            default_value='forward',
+            description='Controller type: "jtc" (JointTrajectory) or '
+                        '"forward" (ForwardCommand).',
         ),
         OpaqueFunction(function=launch_setup),
     ])
