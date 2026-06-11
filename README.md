@@ -133,7 +133,7 @@ These are built into `orchestrator.py` and map to the evaluation priorities:
 |---|---|---|---|
 | Bet detection (SMALL vs BIG) | `40` | `40` | `100%` |
 | Dice reading (correct sum) | offline val set | — | mAP50 = **94.5 %**, P = 95.6 %, R = 85.4 % (YOLOv8n, 50 epochs) |
-| Chip-collect ACT (successful grasp + place) | `40` | `37` | `<92.5%` |
+| Chip-collect ACT (successful grasp + place) | `40` | `37` | `92.5%` |
 | Chip dispense (scripted) | `40` | `40` | `100%` |
 
 > Bet detection, ACT, and dispense numbers should be filled in after running repeated live rounds with `test_bet.py` and manual logging.
