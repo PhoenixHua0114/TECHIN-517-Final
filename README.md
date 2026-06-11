@@ -131,10 +131,10 @@ These are built into `orchestrator.py` and map to the evaluation priorities:
 
 | Stage | Trials | Correct | Accuracy |
 |---|---|---|---|
-| Bet detection (SMALL vs BIG) | `<n>` | `<n>` | `<%>` |
+| Bet detection (SMALL vs BIG) | `40` | `40` | `100%` |
 | Dice reading (correct sum) | offline val set | — | mAP50 = **94.5 %**, P = 95.6 %, R = 85.4 % (YOLOv8n, 50 epochs) |
-| Chip-collect ACT (successful grasp + place) | `<n>` | `<n>` | `<%>` |
-| Chip dispense (scripted) | `<n>` | `<n>` | `<%>` |
+| Chip-collect ACT (successful grasp + place) | `40` | `37` | `<92.5%` |
+| Chip dispense (scripted) | `40` | `40` | `100%` |
 
 > Bet detection, ACT, and dispense numbers should be filled in after running repeated live rounds with `test_bet.py` and manual logging.
 
@@ -142,9 +142,9 @@ These are built into `orchestrator.py` and map to the evaluation priorities:
 
 | Metric | Value |
 |---|---|
-| Full-round success rate | `<%>` |
-| Rounds before a reset/maintenance is needed | `<n>` |
-| Mean round duration | `<s>` |
+| Full-round success rate | `92.5%` |
+| Rounds before a reset/maintenance is needed | `4 rounds at leaset` |
+| Mean round duration | `1 min 12s` |
 
 
 ## 7. Pretrained models
