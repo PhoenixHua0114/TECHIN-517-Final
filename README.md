@@ -254,8 +254,6 @@ capture a row.
 
 ## 11. Team contributions
 
-<!-- TODO(team): every member must be listed with their concrete contributions. -->
-
 | Member | Contributions |
 |---|---|
 | `Phoenix Hua` | `YOLO dice recognition (model implementation, ROI calibration, 8× upscale fix); orchestrator integration (chip detection → FK sequence → YOLO readout → BIG/SMALL logic); ROS 2 node architecture & system pipeline design ` |
